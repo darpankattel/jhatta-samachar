@@ -25,7 +25,7 @@ Ensure you have the following installed:
 1. **Clone the repository**:
 
 ```bash
-https://github.com/darpankattel/jhatta-samachar
+git clone https://github.com/darpankattel/jhatta-samachar
 cd jhatta-samachar
 ```
 
@@ -57,7 +57,7 @@ python manage.py runserver
 
 6. **Access the application**:
 
-Open a browser and navigate to: `http://127.0.0.1:8000/`
+    Open a browser and navigate to: `http://127.0.0.1:8000/`
 
 ### Environment Variables
 
