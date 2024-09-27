@@ -1,0 +1,12 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools %}
+<div class="object-tools">
+    <ul class="object-tools">
+        <li>
+            <a href="{% url 'admin:crawl-ekantipur' %}" class="button green">Crawl Ekantipur</a>
+            <a href="/api/news/summarizeall/" class="button green">Summarize All</a>
+        </li>
+    </ul>
+</div>
+{% endblock %}

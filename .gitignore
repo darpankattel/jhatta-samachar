@@ -1,0 +1,15 @@
+.env
+
+venv
+models
+db.sqlite3
+
+media
+
+# Ignore pycache
+__pycache__/
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+*.pyd
