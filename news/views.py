@@ -72,9 +72,10 @@ class NewsSummaryMP3View(APIView):
         print("Converting!")
         # Use gTTS to generate the MP3 file
         file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}.mp3"
-        tts = gTTS(text)
-        tts.save(file_name)
-        print(f"MP3 file saved at: {file_name}")
+        if not os.path.exists(file_name):
+            tts = gTTS(text)
+            tts.save(file_name)
+            print(f"MP3 file saved at: {file_name}")
         # Serve the MP3 file as a response
         with open(file_name, "rb") as f:
             response = HttpResponse(f.read(), content_type="audio/mp3")

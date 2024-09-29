@@ -77,7 +77,8 @@ The API follows a RESTful fashion. Token authentication is required for endpoint
 ### **Account Endpoints**
 
 #### 1. **Google OAuth Authentication**
-**POST** `/api/auth/google/`  
+**POST** `/api/auth/google/`
+
 Authenticates the user using Google OAuth2.0. The frontend sends an ID token, which is verified via the Google API.
 
 - **Request Example:**
@@ -91,6 +92,7 @@ Creates a new user or updates an existing one, returning a Knox token for furthe
 
 #### 2. **Hardcoded Login**
 **POST** `/api/auth/hardcoded-login/`
+
 Logs in a user with hardcoded credentials (username and password) and returns a Knox token.
 
 **Response**:
@@ -99,6 +101,7 @@ Returns a Knox token to authenticate subsequent requests.
 
 #### 3. **Logout**
 **POST** `/api/auth/logout/`
+
 Logs out the authenticated user by deleting their Knox token.
 
 **Response**:
@@ -107,6 +110,7 @@ Successfully logs the user out.
 
 #### 4. **Update Preferences**
 **POST** `/api/auth/preferences/`
+
 Updates the user's preferences, such as liked and disliked categories for news.
 
 Expected JSON Input:
@@ -123,18 +127,22 @@ Updates the user's preferences successfully.
 
 #### 5. **User Profile**
 **GET** `/api/auth/profile/`
+
 Retrieves the authenticated user's profile information.
 
 
 ### News Endpoints
 #### 1. **Get News Summary**
 **GET** `/api/news/`
+
 Lists news articles based on the user's preferences (liked and disliked categories). Only summaries are provided in the response.
 
 #### 2. **Get News Category**
 **GET** `/api/news/category/`
+
 Lists all the available news categories with pagination support.
 
 #### 3. **Generate News MP3**
 **GET** `/api/news/mp3/`
+
 Generates and returns an MP3 file containing a summary of the latest news articles.
