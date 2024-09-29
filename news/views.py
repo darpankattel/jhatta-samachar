@@ -2,7 +2,7 @@ from rest_framework.authentication import SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from gtts import gTTS
 import os
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from rest_framework import generics, status
 from .models import News, Category
 from account.models import CustomUser
@@ -54,33 +54,37 @@ class NewsSummaryListView(generics.ListAPIView):
 class NewsSummaryMP3View(APIView):
     """
     Generates an MP3 file containing a summary of the latest news articles.
+
+    Paginated response is supported.
     """
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    pagination_class = CustomPagination
 
     def get(self, request, *args, **kwargs):
-        # user = request.user
-        user = User.objects.first()
-        print(f"User: {user}")
+        user = request.user
         custom_user = CustomUser.objects.get(user=user)
         news = custom_user.get_preferred_news()
 
-        print(f"News: {news}")
+        paginator = self.pagination_class()
+        page = paginator.paginate_queryset(news, request)
+
+        if page is not None:
+            news = page
+
         text = "Let's start today's latest news summary. " + " Now, Next News. ".join(
             [article.title + " " + article.summary for article in news]) + " That's all for today. Have a great day!"
 
-        print("Converting!")
         # Use gTTS to generate the MP3 file
         file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}.mp3"
         if not os.path.exists(file_name):
+            print("Converting!")
             tts = gTTS(text)
             tts.save(file_name)
             print(f"MP3 file saved at: {file_name}")
         # Serve the MP3 file as a response
-        with open(file_name, "rb") as f:
-            response = HttpResponse(f.read(), content_type="audio/mp3")
-            response['Content-Disposition'] = 'attachment; filename="news_bulletin.mp3"'
-            return response
+
+        return FileResponse(open(file_name, "rb"), content_type="audio/mp3")
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 

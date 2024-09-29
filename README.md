@@ -145,4 +145,104 @@ Lists all the available news categories with pagination support.
 #### 3. **Generate News MP3**
 **GET** `/api/news/mp3/`
 
-Generates and returns an MP3 file containing a summary of the latest news articles.
+This API generates and streams an MP3 file containing a summary of the latest news articles based on the user’s preferences.
+
+**Paginated response is supported via the #1 endpoint for news summary.**
+
+**Response**:
+Content Type: *audio/mp3*
+Streaming: *The response streams the MP3 file directly.*
+
+#### Example usecase in Flutter
+To handle the MP3 file streaming in a Flutter app, we can use the `http` package along with the `audioplayers` package to stream or download the MP3 file.
+
+1. Add the necessary packages to your `pubspec.yaml` file:
+
+```yaml
+  dependencies:
+  http: ^0.13.3
+  audioplayers: ^0.20.1
+```
+
+2. Stream the MP3 file in Flutter using http and play it using audioplayers:
+
+```dart
+import 'package:http/http.dart' as http;
+import 'package:audioplayers/audioplayers.dart';
+
+Future<void> playNewsSummary(String token) async {
+  final url = '/api/news/mp3/';
+  final headers = {'Authorization': 'Token $token'};
+
+  try {
+    final response = await http.get(Uri.parse(url), headers: headers);
+
+    if (response.statusCode == 200) {
+      // Initialize audio player
+      AudioPlayer audioPlayer = AudioPlayer();
+      // Play the streamed MP3 file
+      await audioPlayer.play(BytesSource(response.bodyBytes));
+    } else {
+      print('Failed to load MP3. Status code: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error: $e');
+  }
+}
+
+```
+
+#### Example usecase in React/Next.js
+To handle MP3 streaming in React or Next.js, we can use the axios library to fetch the streaming MP3 data, and then the Audio tag or an audio player library like react-audio-player to play it.
+
+1. Install Axios (if not already installed):
+```bash
+npm install axios
+```
+
+2. React code to stream and play the MP3 file:
+
+```jsx
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+
+const NewsSummaryPlayer = () => {
+  const [audioSrc, setAudioSrc] = useState(null);
+
+  useEffect(() => {
+    const fetchMP3 = async () => {
+      const token = 'YOUR_AUTH_TOKEN';  // Replace with your token
+      try {
+        const response = await axios.get('/api/news/mp3/', {
+          headers: { Authorization: `Token ${token}` },
+          responseType: 'blob',  // Ensure the response is treated as a file
+        });
+        
+        // Create a URL for the MP3 file and set it as the audio source
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mp3' }));
+        setAudioSrc(url);
+      } catch (error) {
+        console.error('Error fetching the MP3 file:', error);
+      }
+    };
+
+    fetchMP3();
+  }, []);
+
+  return (
+    <div>
+      {audioSrc ? (
+        <audio controls>
+          <source src={audioSrc} type="audio/mp3" />
+          Your browser does not support the audio tag.
+        </audio>
+      ) : (
+        <p>Loading news summary...</p>
+      )}
+    </div>
+  );
+};
+
+export default NewsSummaryPlayer;
+
+```
