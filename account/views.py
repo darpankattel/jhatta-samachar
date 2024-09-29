@@ -105,10 +105,12 @@ class PreferenceView(generics.CreateAPIView):
     Updates the user's preferences.
 
     Expected input format:
+    ```
     {
         "likes": [category_id1, category_id2, ...],
         "dislikes": [category_id1, category_id2, ...]
     }
+    ```
     """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
