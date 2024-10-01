@@ -17,6 +17,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from knox.models import AuthToken
+import requests as normal_requests
 
 
 class UserLogoutView(LogoutView):
@@ -28,7 +29,7 @@ class UserLogoutView(LogoutView):
 
 class GoogleAuthView(APIView):
     """
-    Authenticates the user using Google OAuth2.0.
+    Authenticates the user using Firebase OAuth2.0.
 
     The view receives an ID token from the frontend and verifies it using the Google API.
 
@@ -43,18 +44,17 @@ class GoogleAuthView(APIView):
             return Response({'error': 'ID token is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Specify the CLIENT_ID of the app that accesses the backend
-            idinfo = id_token.verify_oauth2_token(
-                id_token_str, google_requests.Request(), settings.GOOGLE_CLIENT_ID
+            # print(f"GOOGLE CLIENT ID: {settings.GOOGLE_CLIENT_ID}")
+            idinfo = id_token.verify_firebase_token(
+                id_token_str, google_requests.Request()
             )
-
-            # ID token is valid. Get the user's Google Account information
+            # settings.GOOGLE_CLIENT_ID
             google_id = idinfo['sub']
             email = idinfo.get('email')
             name = idinfo.get('name')
             picture = idinfo.get('picture')
 
-            # Check if user exists, if not create one
+            # print(google_id, email, name, picture)
             try:
                 user = User.objects.get(username=email)
             except User.DoesNotExist:
@@ -78,7 +78,10 @@ class GoogleAuthView(APIView):
             # Generate Knox Token
             _, token = AuthToken.objects.create(user)
 
-            return Response({'token': token}, status=status.HTTP_200_OK)
+            return Response({
+                'token': token,
+                "new_user": created
+            }, status=status.HTTP_200_OK)
 
         except ValueError as e:
             print(e)
