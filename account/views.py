@@ -127,11 +127,9 @@ class PreferenceView(generics.CreateAPIView):
         dislikes = request.data.get('dislikes', [])
         print(likes, dislikes)
 
-        if likes:
-            custom_user.likes.set(likes)
+        custom_user.likes.set(likes)
 
-        if dislikes:
-            custom_user.dislikes.set(dislikes)
+        custom_user.dislikes.set(dislikes)
 
         # custom_user.save()
 
