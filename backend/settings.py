@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 import os
 import dotenv
 from pathlib import Path
-from datetime import timedelta
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,9 +29,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-DEPLOYED = False
+DEPLOYED = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["darpankattel.pythonanywhere.com", "127.0.0.1"]
 
 
 # Application definition

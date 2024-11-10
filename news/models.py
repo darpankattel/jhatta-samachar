@@ -4,10 +4,17 @@ from django.db import models
 class Category(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def __save__(self, *args, **kwargs):
+        self.slug = self.slug.lower()
+        if self.slug and (not self.name):
+            self.name = self.slug.replace("-", " ").replace("_", " ").title()
+        super(Category, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "Categories"
