@@ -33,4 +33,4 @@ class CustomUser(models.Model):
         if disliked_categories:
             news = news.exclude(category__in=disliked_categories)
 
-        return news
+        return news[:10]

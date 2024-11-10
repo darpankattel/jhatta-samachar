@@ -31,7 +31,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = True
 DEPLOYED = True
 
-ALLOWED_HOSTS = ["darpankattel.pythonanywhere.com", "127.0.0.1"]
+ALLOWED_HOSTS = ["darpankattel2.pythonanywhere.com", "127.0.0.1"]
 
 
 # Application definition
