@@ -151,8 +151,8 @@ if not DEPLOYED:
     ]
     MEDIA_ROOT = BASE_DIR / 'media'
 else:
-    STATIC_ROOT = '/var/www/jhattasamachar/static/'
-    MEDIA_ROOT = '/var/www/jhattasamachar/media/'
+    STATIC_ROOT = BASE_DIR / 'static'
+    MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
