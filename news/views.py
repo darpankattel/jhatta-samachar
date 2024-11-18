@@ -79,7 +79,7 @@ class NewsSummaryMP3View(APIView):
             text += " For more news, please press the next button."
 
         # Use gTTS to generate the MP3 file
-        file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}-{paginator.page_number}.mp3"
+        file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}-{request.GET.get('page', 1)}.mp3"
         if not os.path.exists(file_name):
             print("Converting!")
             tts = gTTS(text)
