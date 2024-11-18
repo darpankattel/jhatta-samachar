@@ -14,7 +14,6 @@ from knox.auth import TokenAuthentication
 from core.pagination import CustomPagination
 # media
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.db.models import Q
 from django.contrib import messages
 from django.shortcuts import redirect
@@ -35,16 +34,16 @@ class NewsSummaryListView(generics.ListAPIView):
         user = self.request.user
         custom_user = CustomUser.objects.get(user=user.id)
 
-        news_without_summary = custom_user.get_preferred_news().filter(
-            Q(summary__isnull=True) | Q(summary='')
-        )
+        # news_without_summary = custom_user.get_preferred_news().filter(
+        #     Q(summary__isnull=True) | Q(summary='')
+        # )
 
-        if news_without_summary.count() != 0:
-            from .utils import get_news_summary
-            for _news in news_without_summary:
-                new_summary = get_news_summary(_news)
-                _news.summary = new_summary
-                # _news.save()
+        # if news_without_summary.count() != 0:
+        #     from .utils import get_news_summary
+        #     for _news in news_without_summary:
+        #         new_summary = get_news_summary(_news)
+        #         _news.summary = new_summary
+        #         _news.save()
 
         news = custom_user.get_preferred_news()
 
@@ -72,11 +71,15 @@ class NewsSummaryMP3View(APIView):
         if page is not None:
             news = page
 
-        text = "Let's start today's latest news summary. " + " Now, Next News. ".join(
-            [article.title + " " + article.summary for article in news]) + " That's all for today. Have a great day!"
+        text = "Let's start the news summary. " + " Now, Next News. ".join(
+            [article.title + ". " + article.summary for article in news]) + ". That's all for now. Thank you for listening."
+
+        # if paginator contains next page
+        if paginator.get_next_link():
+            text += " For more news, please press the next button."
 
         # Use gTTS to generate the MP3 file
-        file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}.mp3"
+        file_name = f"{settings.MEDIA_ROOT}/mp3/{user.id}-{paginator.page_number}.mp3"
         if not os.path.exists(file_name):
             print("Converting!")
             tts = gTTS(text)
@@ -108,16 +111,16 @@ class SummarizeAllNewsView(APIView):
     permission_classes = [IsAuthenticated, IsAdminUser]
 
     def get(self, request, *args, **kwargs):
-        try:
-            news = News.objects.filter(Q(summary__isnull=True) | Q(summary=''))
-            from .utils import get_news_summary
-            for _news in news:
-                new_summary = get_news_summary(_news)
-                _news.summary = new_summary
-                # _news.save()
-            messages.success(
-                request, "All news articles have been summarized.")
-            return redirect('/admin/news/news/')
-        except Exception as e:
-            messages.error(request, f"An error occurred: {str(e)}")
-            return redirect('/admin/news/news/')
+        # try:
+        news = News.objects.filter(Q(summary__isnull=True) | Q(summary=''))
+        from .utils import get_news_summary
+        for _news in news:
+            new_summary = get_news_summary(_news)
+            _news.summary = new_summary
+            _news.save()
+        messages.success(
+            request, f"All {len(news)} news articles have been summarized.")
+        return redirect('/admin/news/news/')
+        # except Exception as e:
+        #     messages.error(request, f"An error occurred: {str(e)}")
+        #     return redirect('/admin/news/news/')

@@ -1,50 +1,21 @@
 from news.models import News
-import numpy as np
-from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from datasets import load_dataset
+from transformers import T5ForConditionalGeneration, T5Tokenizer
+from django.conf import settings
+import os
 
-# Load your transformer model
-model = load_model('models/transformer.latest.keras')
-
-# Tokenization and padding (example, modify as per your model's requirements)
-tokenizer = Tokenizer()  # Initialize the tokenizer
-# Load your tokenizer's word index if you have one
-# tokenizer.word_index = {...}  # Uncomment and define if needed
+model = T5ForConditionalGeneration.from_pretrained(os.path.join(
+    settings.BASE_DIR, 'models/kaggle/working/pre_trained/model/pretrained_t5-small'))
+tokenizer = T5Tokenizer.from_pretrained(os.path.join(
+    settings.BASE_DIR, 'models/kaggle/working/pre_trained/model/pretrained_t5-small-tokenizer'))
 
 
-def preprocess_text(content: str) -> np.array:
-    """
-    Preprocess the news content for the transformer model.
-
-    :param content: The news content to be summarized.
-    :return: Preprocessed input for the model.
-    """
-    # Convert to lower case
-    content = content.lower()
-
-    # Tokenization
-    sequences = tokenizer.texts_to_sequences([content])
-
-    # Padding sequences to ensure uniform input size
-    padded_sequences = pad_sequences(
-        sequences, maxlen=500)  # Adjust maxlen as needed
-
-    return padded_sequences
-
-
-def generate_summary(predictions: np.array) -> str:
-    """
-    Generate a human-readable summary from the model's predictions.
-
-    :param predictions: The output from the model.
-    :return: A summarized string.
-    """
-    # Post-processing logic to convert model predictions to text
-    # This is a placeholder; you need to implement this according to your model's output
-    summary = " ".join([str(pred) for pred in predictions])
-
-    return summary
+def summarize(article: str) -> str:
+    inputs = tokenizer(
+        f"summarize: {article}", return_tensors='pt', max_length=1024, truncation=True)
+    summary_ids = model.generate(inputs['input_ids'], max_length=150,
+                                 min_length=40, length_penalty=2.0, num_beams=4, early_stopping=True)
+    return tokenizer.decode(summary_ids[0], skip_special_tokens=True)
 
 
 def get_news_summary(news: News) -> str:
@@ -54,14 +25,5 @@ def get_news_summary(news: News) -> str:
     :param news: An instance of a news article.
     :return: A summary of the news article.
     """
-    return "hehe"
-    # Step 1: Preprocess the news content
-    preprocessed_content = preprocess_text(news.content)
-
-    # Step 2: Generate predictions using the transformer model
-    predictions = model.predict(preprocessed_content)
-
-    # Step 3: Convert model predictions to a readable summary
-    summary = generate_summary(predictions)
-
+    summary = summarize(f"{news.content}")
     return summary

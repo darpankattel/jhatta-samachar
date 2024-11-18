@@ -56,8 +56,8 @@ class EkantipurCrawler(APIView):
                 title = news_soup.find("h1").text.strip(
                 ) if news_soup.find("h1") else None
                 # TODO: comment the summary, as we will generating it from the content
-                summary = news_soup.find(
-                    'meta', {'name': 'description'}).get('content', None)
+                # summary = news_soup.find(
+                #     'meta', {'name': 'description'}).get('content', None)
                 keywords = news_soup.find(
                     'meta', {'name': 'keyword'}).get('content', None)
                 og_image_url = news_soup.find(
@@ -93,7 +93,7 @@ class EkantipurCrawler(APIView):
                         "og_image_url": og_image_url,
                         "title": title,
                         "content": content,
-                        "summary": summary,
+                        # "summary": summary,
                         "category": category,
                         "published_at": published_at
                     }
